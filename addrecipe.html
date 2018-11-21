@@ -23,16 +23,17 @@
             <div class="topnav">                    
                 <div class="topnav">
                     <a href="index.html">Home</a>
-                    <a class="active">Add Recipe</a>
+                    <a href="#" class="active">Add Recipe</a>
                     <a href="#">User Recipes</a>
                 </div>
             </div>
             <br>  
 
-            <!-- This is Search Section -->
+            <!-- Submit Recipe Section -->
             <div class="card-header">
                 Submit Your Own Recipe
             </div>
+
                 <div class="card-body">
                     <form>
                         <div class="form-group">
@@ -43,23 +44,120 @@
                             <label for="search-input">Name of Drink</label>
                             <input type="text" class="form-control" id="drink-name-input" placeholder="">
                         </div>
-                        <div class="form-group">
-                            <label for="search-input">Ingredients</label>
-                            <input type="text" class="form-control" id="ingredient-input" placeholder="">
+
+                        <p>Ingredients:</p>
+
+                        <!-- Row Labels -->
+                        <div class="form-row">
+                            <div class="col-2">
+                                <label for="search-input">Quantity</label>
+                            </div>
+                            <div class="col-2">
+                                <label for="search-input">Units</label>
+                            </div>
+                            <div class="col-8">
+                                <label for="search-input">Ingredient</label>
+                            </div>
                         </div>
 
+                        <!-- Row 1 -->
+                        <div class="form-row">
+                            <div class="col-2">
+                                <input type="text" class="form-control" placeholder="Quantity">
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control" placeholder="Units">
+                                    <option>Ounces</option>
+                                    <option>Mililiters</option>
+                                    <option>Parts</option>
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" placeholder="Ingredient">
+                            </div>
+                        </div>
 
+                        <!-- Row 2 -->
+                        <div class="form-row">
+                            <div class="col-2">
+                                <input type="text" class="form-control" placeholder="Quantity">
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control" placeholder="Units">
+                                    <option>Ounces</option>
+                                    <option>Mililiters</option>
+                                    <option>Parts</option>
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" placeholder="Ingredient">
+                            </div>
+                        </div>
 
+                        <!-- Row 3 -->
+                        <div class="form-row">
+                            <div class="col-2">
+                                <input type="text" class="form-control" placeholder="Quantity">
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control" placeholder="Units">
+                                    <option>Ounces</option>
+                                    <option>Mililiters</option>
+                                    <option>Parts</option>
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" placeholder="Ingredient">
+                            </div>
+                        </div>
 
+                        <!-- Row 4 -->
+                        <div class="form-row">
+                            <div class="col-2">
+                                <input type="text" class="form-control" placeholder="Quantity">
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control" placeholder="Units">
+                                    <option>Ounces</option>
+                                    <option>Mililiters</option>
+                                    <option>Parts</option>
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" placeholder="Ingredient">
+                            </div>
+                        </div>
 
+                        <!-- Row 5 -->
+                        <div class="form-row">
+                            <div class="col-2">
+                                <input type="text" class="form-control" placeholder="Quantity">
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control" placeholder="Units">
+                                    <option>Ounces</option>
+                                    <option>Mililiters</option>
+                                    <option>Parts</option>
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" placeholder="Ingredient">
+                            </div>
+                        </div>
 
+                        <!-- TEMP -->
+                        <br> 
 
+                        <div class="form-group">
+                            <label for="instructionsFormControlTextarea">Instructions</label>
+                            <textarea class="form-control" id="instructionsFormControlTextarea" rows="3"></textarea>
+                        </div>
 
+                        <button id="submit-drink-button" type="submit" class="btn btn-primary">Submit</button>
 
-                        <button id="submit-button" type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                        
+                    </form> <!-- End form -->
                 </div>
-
 
         </div>
     </body>
