@@ -93,9 +93,15 @@ class NYTimes extends APISearch {
   //
   showArticles(searchTerm) {
     let result = super.getArticles(searchTerm);
-
-    this.numArticles += result.docs.length;
-
+    let docs = result.response.docs;
     
+    docs.forEach(element => {
+      let div = $('<div>');
+      let h5 = $('<h5>');
+
+      h5.text(element.abstract);
+      div.append(h5);
+      this.targetID.prepend(div);
+    });
   }
 }
