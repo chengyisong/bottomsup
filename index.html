@@ -7,7 +7,14 @@
         <link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="./assets/css/homePageStyle.css">
+
         <meta name="viewport" content="width=device-width">
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        
+        <!-- For articles search -->
+        <script src="assets/javascript/articles.js"></script>
     </head>
 
     <body>
@@ -39,7 +46,6 @@
                             <label class="checkbox-inline"><input type="checkbox" value=""><p>alcoholic</p></label>
                             <label class="checkbox-inline"><input type="checkbox" value=""><p>non-alcoholic</p></label>
                         </div>
-
                         <button id="submit-button" type="submit" class="btn btn-primary">Search</button>
                     </form>
                 </div>
@@ -52,12 +58,23 @@
             </div>
 <!-- This is Articles from internet search -->
             <div class="card">
-                <div class="card-header">Articles</div>
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link article-link" href="#" id="tab-articles">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link article-link" href="#" id="tab-web">Web</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link article-link" href="#" id="tab-video">Video</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="card-body">
                     <div id="articlesResult"></div>
                 </div>
             </div>
-
         </div>
     </body>
 </html>

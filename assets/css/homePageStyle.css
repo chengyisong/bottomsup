@@ -11,7 +11,7 @@
             background-size: auto 100%;
             background-image: right;        
         }
-        .card-header {
+        .card-header, .article-link {
             background-color:rgb(187,211,62);
             color: aliceblue;
             font-weight: 700;
