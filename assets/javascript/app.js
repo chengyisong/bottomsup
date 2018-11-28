@@ -1,18 +1,6 @@
 // Bottoms Up -- Wilder Molyneux -- app.js -- 11/26/18
 
 // Initialize Firebase -- chengyison instance
-// 11/26/18 - https://console.firebase.google.com/u/0/project/uwbottomsup/database/data/ SHOWS AN UNKNOWN ERROR WHEN ATTEMPTING TO ACCESS/VIEW
-
-//   var config = {
-//     apiKey: "AIzaSyCFqAd4UK2fTREHACjWb725Pvp3pKI4PwM",
-//     authDomain: "uwbottomsup.firebaseapp.com",
-//     databaseURL: "https://uwbottomsup.firebaseio.com",    
-//     projectId: "uwbottomsup",
-//     storageBucket: "",                   // THIS SHOULD NOT BE AN EMPTY STRING; example -- storageBucket: "wilder-train-scheduler.appspot.com",
-//     messagingSenderId: "844557366354"
-//   };
-//   firebase.initializeApp(config);
-
 var configAdd = {
     apiKey: "AIzaSyCFqAd4UK2fTREHACjWb725Pvp3pKI4PwM",
     authDomain: "uwbottomsup.firebaseapp.com",
@@ -25,7 +13,7 @@ var configAdd = {
 firebase.initializeApp(configAdd);
 
 // Create a variable to reference the database
-var databaseAdd = firebase.database();
+let databaseAdd = firebase.database();
 
 // Variable for user submitted drinks
 let userSubmittedDrink = {          
@@ -57,9 +45,6 @@ $("#submit-drink-button").on("click", function(event) {
         let ingredientID = "#ingredient-input-name-" + i;
 
         // Get user input values
-        // let tempQuantity = 0
-        // tempQuantity = $(quantityID).val().trim();
-
         let tempQuantity = $(quantityID).val().trim();
 
         if (tempQuantity != "") {
@@ -92,6 +77,12 @@ $("#submit-drink-button").on("click", function(event) {
 
         userSubmittedDrink: userSubmittedDrink 
     });
+
+    // Reset userSubmittedDrink variable for next set of input values
+    userSubmittedDrink.userName = "";
+    userSubmittedDrink.nameOfDrink = "";
+    userSubmittedDrink.ingredients = [];        // Set ingredients array to contain nothing
+    userSubmittedDrink.ingredients = "";
 
 }); // End Capture button click for recipe submission
 
