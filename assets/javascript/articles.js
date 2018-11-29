@@ -11,8 +11,9 @@
 //
 $(document).ready(() => {
   const article = new NYTimes();       // NYTimes API
+  // const article = new NewsAPI();       // News API
   const web = new GCSE();              // Google custom search engine
-  const video = new YTSL();             // YouTube search list
+  const video = new YTSL();            // YouTube search list
 
   // Submit button click event
   $('#submit-button').click(event => {
@@ -175,7 +176,6 @@ class APISearch {
     });
   }
 
-
   //
   // Construct a search query string
   //
@@ -197,32 +197,30 @@ class APISearch {
 }
 
 //
-// Search articles on NYTimes API and display the results
+// News API
 //
-class NYTimes extends APISearch {
+class NewsAPI extends APISearch {
   constructor() {
     super();
-    this.url = "https://api.nytimes.com/svc/search/v2";
-    this.endPt = "articlesearch.json";
-    this.numItems = 0;      // # of search result items
+    this.url = "https://newsapi.org/v2";
+    this.endPt = "everything";
   }
 
   //
-  // Set up NYTimes specific query parameters.
+  // Set up News API specific query parameters.
   //
-  // Need a heavy "filter query"(fq) setting in order to get reasonable
-  // results for (non-)alcoholic drinks. However, this also back-fires
-  // for not-so-popular cocktails and ingredients.
-  // https://github.com/NYTimes/public_api_specs/blob/master/article_search/article_search_v2.md
+  // With or without newsSources, the query results have been disappointing...
   //
   queryParams(searchTerm) {
+    const newsSources = ["associated-press", "buzzfeed", "business-insider",
+                          "google-news", "usa-today",
+                          "the-new-york-times", "time", "the-huffington-post",
+                          "fortune"];
+
     const params = {
-      'fq': `(snippet:("${searchTerm}") OR headline:("${searchTerm}") OR abstract:("${searchTerm}")) AND
-       news_desk:("Arts & Leisure" "Business" "Culture" "Dining" "Fashion & Style" "Food" "Favorites" "Style" "Society" "Weekend")
-       AND section_name:("Dining & Wine" "Dining and Wine" "Food" "Style")`,
-      'page': this.offset,
-      'sort': "newest", 
-      'api-key': '5260dec6c5a34dab92a984130fa8b6d6',
+      'sortBy': "relevancy", // "popularity", 
+      'sources': newsSources.join(","),
+      'apiKey': '432e28734a904d0abe30f89e021f1759',
     }
 
     return params;
@@ -237,13 +235,140 @@ class NYTimes extends APISearch {
   // *         ELSE, append found articles to the target selector
   //
   searchArticles(searchTerm, clear = true) {
+    let boostedTerm = searchTerm;  // for getting a better query result
+
     if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
       return;
     }
 
+    // revise the search term by adding "cocktail drink" at the end
+    if (!/cocktail/.test(searchTerm)) { 
+      boostedTerm += ' cocktail';
+    }
+
     if (clear) {
+      $('#articlesResult').html(`<div>
+        <h2 style="display: inline-block;">Articles about "${searchTerm}"</h2>
+        <span style="font-size: 0.8em; float: right">powered by News API</span>
+        </div>`);
+    }
+
+    super.getArticles(boostedTerm, this.showArticles, this.queryParams(searchTerm));
+  }
+
+  //
+  // Show articles -- this is a callback function passed to getArticles
+  //
+  showArticles(result) {
+    const docs = result.articles;
+    let numItems = 0;
+
+    if (docs.length === 0) {
+      $('#articlesResult').html('<h5>No matching result found</h5>');
+      return;
+    }
+
+    // console.log('JSON: ' + JSON.stringify(docs));
+    docs.forEach(item => {
+      const div = $('<div>');
+      const h5 = $('<h5 class="mb-1">');
+      const h5Link = $('<a>');
+      const link = $('<a>');
+      const p = $('<p class="mb-1">');
+      const p2 = $('<p class="mb-1">');
+      const br = $('<br>');
+      let img = null;
+
+      h5Link.attr('href', item.url).attr('target', '_blank');
+      h5Link.attr('style', "color: #3355dd;")
+      h5Link.text(item.title);
+      h5.append(h5Link);
+      link.attr('href', item.url).attr('target', '_blank');
+      link.text(item.url);
+      link.attr('style', "color: lightslategray; font-size: 0.8em");
+      p.text(item.description);
+      p2.text(item.publishedAt + " written by " + item.author);
+      p2.attr('style', 'font-size: 0.7em');
+
+      if (item.urlToImage) {
+        img = $('<img>');
+        img.attr('src', item.urlToImage);
+        img.attr('alt', 'missing image');
+        img.attr('style', 'width: 15vw');
+        img.addClass("img-fluid .img-thumbnail rounded float-right");
+      }
+      div.addClass('w-50 d-inline-block mb-2');
+
+      div.append(h5).append(p).append(link).append(p2);
+      $('#articlesResult').append(div).append(img).append(br);
+      numItems++;
+    });
+  }
+}
+
+
+//
+// Search articles on NYTimes API and display the results
+//
+class NYTimes extends APISearch {
+  constructor() {
+    super();
+    this.url = "https://api.nytimes.com/svc/search/v2";
+    this.endPt = "articlesearch.json";
+    this.currentTerm = "";  // current serach keyword
+  }
+
+  //
+  // Set up NYTimes specific query parameters.
+  //
+  // Need a heavy "filter query"(fq) setting in order to get reasonable
+  // results for (non-)alcoholic drinks. However, this also back-fires
+  // for not-so-popular cocktails and ingredients w/o getting any results.
+  // https://github.com/NYTimes/public_api_specs/blob/master/article_search/article_search_v2.md
+  //
+  queryParams(searchTerm) {
+    const numArticles = this.numOfArticles();
+    let pageOffset = (numArticles === 0) ? 0 : Math.floor((numArticles - 1) / 10);
+
+    if (numArticles > pageOffset * 10) {
+      pageOffset += 1;
+    }
+    console.log(`# of articles ${numArticles}, page offset ${pageOffset} `);
+
+    const params = {
+      'fq': `(snippet:("${searchTerm}") OR headline:("${searchTerm}") OR ` +
+            `abstract:("${searchTerm}")) AND news_desk:("Arts & Leisure" ` +
+            `"Business" "Culture" "Dining" "Fashion & Style" "Food" ` +
+            `"Favorites" "Style" "Society" "Weekend") AND section_name:(` +
+            `"Dining & Wine" "Dining and Wine" "Food" "Style")`,
+      'page': pageOffset,
+      'sort': "newest", 
+      'api-key': '5260dec6c5a34dab92a984130fa8b6d6',
+    };
+
+    return params;
+  }
+
+  //
+  // Search articles through jQuery.AJAX call
+  //
+  // PARAMS:
+  // * searchTerm = search terms string
+  // * clear = IF true, clear the selector contents before populating
+  // *         ELSE, append found articles to the target selector
+  //
+  searchArticles(searchTerm) {
+    if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
+      return;
+    }
+
+    const isNewSearch = (this.currentTerm === searchTerm) ? false : true;
+
+    if (isNewSearch) {
+      console.log(`New serach word ${searchTerm} (old: ${this.currentTerm})`);
       $('#articlesResult').text("");
       $('#articlesResult').prepend(`<h2>Articles about "${searchTerm}"</h2><br>`);
+      this.currentTerm = searchTerm;
     }
 
     super.getArticles(searchTerm, this.showArticles, this.queryParams(searchTerm));
@@ -257,7 +382,8 @@ class NYTimes extends APISearch {
     let numItems = 0;
 
     if (docs.length === 0) {
-      $('#articlesResult').html('<h5>No matching result found</h5>');
+      const h5 = $('<h5>').text('No (additional) matching result found');
+      $('#articlesResult').append(h5);
       return;
     }
 
@@ -270,23 +396,31 @@ class NYTimes extends APISearch {
       const p = $('<p>');
       const br = $('<br>');
 
-      h5Link.attr('href', item.web_url);
+      numItems++;
+      div.addClass(`article article-${numItems}`);
+      h5Link.attr('href', item.web_url).attr('target', '_blank');
       h5Link.attr('style', "color: #3355dd;")
       h5Link.text(item.headline.main);
       h5.append(h5Link);
-      link.attr('href', item.web_url);
-      link.text(item.web_url);
+      link.attr('href', item.web_url)
+      link.attr('target', '_blank')
       link.attr('style', "color: lightslategray;");
+      link.text(item.web_url);
       p.text(item.snippet);
-
-      if (numItems % 2 === 0) {
-        div.attr('style', 'background-color: #F7FFFA;');
-      }
 
       div.append(h5).append(link).append(p).append(br);
       $('#articlesResult').append(div);
-      numItems++;
     });
+  }
+
+  //
+  // Find the current number of articles displayed on the web page
+  //
+  numOfArticles() {
+    const num = $('.article').length;
+    console.log("The number of articles: " + num);
+
+    return num;
   }
 }
 
@@ -298,14 +432,16 @@ class GCSE extends APISearch {
     super();
     this.url = "https://www.googleapis.com";
     this.endPt = "customsearch/v1";
-    this.numArticles = 0; // Keeps track of the number of articles
   }
 
+  //
+  // Set up serach query option parameters
+  //
   queryParams() {
     const params = {
-      // extra keywords to facilitate a better query results
+      // extra keywords to facilitate a better query result
       'hq': ['cocktail', 'news', 'article'].join('+'),
-      // save search option: "active" OR "off"
+      // safe search option: "active" OR "off"
       'safe': 'active',
       // custom search engine identifier
       'cx': decodeURIComponent('013726863933950087168%3A0bb4-rj_v_0'),
@@ -316,6 +452,9 @@ class GCSE extends APISearch {
     return params;
   }
 
+  //
+  // Search articles (Google search)
+  //
   searchArticles(searchTerm, clear = true) {
     if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
       return;
@@ -332,11 +471,15 @@ class GCSE extends APISearch {
   //
   showArticles(result) {
     const items = result.items;
-    let numItems = 0;
+    if ($('.articles-container').length === 0) {
+      const container = $('<div>').addClass('container articles-container');
+      $('#articlesResult').append(container);
+    }
 
     // console.log('JSON: ' + JSON.stringify(items));
     items.forEach(item => {
-      const div = $('<div>');
+      const row = $('<div class="row">');
+      const col = $('<div class="col-md-10">');
       const h5 = $('<h5>');
       const h5Link = $('<a>');
       const link = $('<a>');
@@ -344,33 +487,33 @@ class GCSE extends APISearch {
       const br = $('<br>');
       let img = null;
 
-      h5Link.attr('href', item.link);
+      // Article Title
+      h5Link.attr('href', item.link).attr('target', '_blank');
       h5Link.attr('style', "color: #3355dd;")
       h5Link.text(item.title);
       h5.append(h5Link);
-      link.attr('href', item.link);
+
+      // Hyperlink to the article 
+      link.attr('href', item.link).attr('target', '_blank');
       link.text(item.link);
       link.attr('style', "color: lightslategray;");
       p.text(item.snippet);
+      col.append(h5).append(link).append(p);
+      row.append(col);
 
+      // If thumbnail is availabe, include it.
       if ("cse_thumbnail" in item.pagemap) {
+        const imgCol = $('<div class="col-md-2">');
+
         img = $('<img>');
         img.attr('src', item.pagemap.cse_thumbnail[0].src);
         img.attr('alt', 'missing image');
-        // img.attr('style', "float: right;")
         img.addClass("img-fluid rounded float-right");
+
+        row.append(imgCol.append(img));
       }
 
-      if (numItems % 2 === 0) {
-        div.attr('style', 'background-color: #F7FFFA;');
-      }
-      div.append(h5).append(link).append(p);
-      if (img) {
-        div.append(img);
-      }
-      div.append(br);
-      $('#articlesResult').append(div);
-      numItems++;
+      $('#articlesResult').append(row);
     });
   }
 }
@@ -383,17 +526,31 @@ class YTSL extends APISearch {
     super();
     this.url = "https://www.googleapis.com";
     this.endPt = "youtube/v3/search";
-    this.numArticles = 0; // Keeps track of the number of articles
   }
 
+  //
+  // Set up serach query option parameters
+  //
   queryParams() {
     const params = {
       // search resource properties that the API response will include.
       'part': 'snippet',
-      // extra keywords to facilitate a better query results
-      'hq': ['cocktail', 'news', 'article'].join('+'),
-      // save search option: "active" OR "off"
-      'safe': 'active',
+      // 1 - 50(max) default=5
+      'maxResults': 10,
+      // safe search option: "none" OR "moderate" OR "strict"
+      'safeSearch': 'moderate',
+      // type: video,channel,playlist (default)
+      'type': 'video',
+      // videoEmbeddable: any OR true
+      'videoEmbeddable': 'true',
+      // restrict a search to only videos that can be played outside youtube.com.
+      // Need to set type=video; any OR true
+      'videoSyndicated': 'true',
+      // Check out videoCategories at the following url and excute the
+      // sample javascript
+      // https://developers.google.com/youtube/v3/docs/videoCategories/list
+      // 26 = Howto & Style
+      'videoCategoryId': '26',
       // custom search engine identifier
       'cx': decodeURIComponent('013726863933950087168%3A0bb4-rj_v_0'),
       // api key
@@ -403,15 +560,26 @@ class YTSL extends APISearch {
     return params;
   }
 
+  //
+  // Search articles(youtube videos)
+  //
   searchArticles(searchTerm, clear = true) {
+    let boostedTerm = searchTerm;  // for getting a better query result
+
     if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
       return;
     }
+
+    // revise the search term by adding "drink" at the end
+    if (!/drink/.test(searchTerm)) { 
+      boostedTerm += ' drink';
+    }
+
     if (clear) {
       $('#articlesResult').text("");
       $('#articlesResult').prepend(`<h2>Search result for "${searchTerm}"</h2><br>`);
     }
-    super.getArticles(searchTerm, this.showArticles, this.queryParams());
+    super.getArticles(boostedTerm, this.showArticles, this.queryParams());
   }
 
   //
@@ -419,7 +587,6 @@ class YTSL extends APISearch {
   //
   showArticles(result) {
     const items = result.items;
-    let numItems = 0;
 
     // console.log('JSON: ' + JSON.stringify(items));
     items.forEach(item => {
@@ -429,13 +596,13 @@ class YTSL extends APISearch {
       const videoId = item.id.videoId;
 
       iframe.attr('src', `https://www.youtube.com/embed/${videoId}`);
-      iframe.attr('width', 450);
-      iframe.attr('height', 350);
+      iframe.attr('width', 300).attr('height', 225);
+      iframe.addClass("embed-responsive embed-responsive-4by3");
+      iframe.attr('allowfullscreen', '')
       p.text(item.snippet.title);
       div.append(iframe).append(p);
-      div.attr('style', 'float: left;'); // would this work?
+      div.addClass("float-md-left m-auto p-2");
       $('#articlesResult').append(div);
-      numItems++;
     });
   }
 }
