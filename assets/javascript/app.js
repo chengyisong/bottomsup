@@ -1,6 +1,6 @@
 // Bottoms Up -- Wilder Molyneux -- app.js -- 11/26/18
 
-// Initialize Firebase -- chengyison instance
+// Initialize Firebase on chengyison account for additions
 $( document ).ready(function() {
 
     var configAdd = {
@@ -11,7 +11,6 @@ $( document ).ready(function() {
         storageBucket: "uwbottomsup.appspot.com",
         messagingSenderId: "844557366354"
     };
-
     firebase.initializeApp(configAdd);
 
     // Create a variable to reference the database
@@ -24,6 +23,7 @@ $( document ).ready(function() {
         userName: "",                   // Name of user
         nameOfDrink: "",                // Name of beverage
         ingredients: [],                // Ingredients array
+        numberOfIngredients: 0,         // Needed for Firebase simplicity as arrays returned are independent objects
         instructions: ""                // Instructions for recipe
     };
 
@@ -63,6 +63,7 @@ $( document ).ready(function() {
                 };
 
                 userSubmittedDrink.ingredients.push(ingredientPush);
+                userSubmittedDrink.numberOfIngredients++;
                 
             } // End quantity if statement
         } // End ingredient gathering loop
@@ -72,18 +73,21 @@ $( document ).ready(function() {
 
         // Validate user input
         // TO BE WRITTEN
-        
 
-        // Update Firebase database
+        // Update Firebase database *********** BUG: ONLY WORKS WITH ONE SUBMIT; THROWS AN ERROR ON SUBSEQUENT SUBMITS WITHOUT PAGE REFRESH
         databaseAdd.ref().push({                   // Using .push from .set for data additions over replacement
-
             userSubmittedDrink: userSubmittedDrink 
         });
 
         // Reset userSubmittedDrink variable for next set of input values
         userSubmittedDrink.userName = "";
         userSubmittedDrink.nameOfDrink = "";
-        userSubmittedDrink.ingredients = [];        // Set ingredients array to contain nothing
+        userSubmittedDrink.ingredients = [];            // Set ingredients array to contain nothing
+        // userSubmittedDrink.ingredients.splice(0, userSubmittedDrink.ingredients.length);
+        // while (userSubmittedDrink.ingredients.length > 0) {
+        //     userSubmittedDrink.ingredients.pop();
+        // }
+        userSubmittedDrink.numberOfIngredients = 0;     // Reset array counter for Firebase ease of use
         userSubmittedDrink.ingredients = "";
 
     }); // End Capture button click for recipe submission
