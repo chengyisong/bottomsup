@@ -1,88 +1,91 @@
 // Bottoms Up -- Wilder Molyneux -- app.js -- 11/26/18
 
 // Initialize Firebase -- chengyison instance
-var configAdd = {
-    apiKey: "AIzaSyCFqAd4UK2fTREHACjWb725Pvp3pKI4PwM",
-    authDomain: "uwbottomsup.firebaseapp.com",
-    databaseURL: "https://uwbottomsup.firebaseio.com",
-    projectId: "uwbottomsup",
-    storageBucket: "uwbottomsup.appspot.com",
-    messagingSenderId: "844557366354"
-  };
+$( document ).ready(function() {
 
-firebase.initializeApp(configAdd);
+    var configAdd = {
+        apiKey: "AIzaSyCFqAd4UK2fTREHACjWb725Pvp3pKI4PwM",
+        authDomain: "uwbottomsup.firebaseapp.com",
+        databaseURL: "https://uwbottomsup.firebaseio.com",
+        projectId: "uwbottomsup",
+        storageBucket: "uwbottomsup.appspot.com",
+        messagingSenderId: "844557366354"
+    };
 
-// Create a variable to reference the database
-let databaseAdd = firebase.database();
+    firebase.initializeApp(configAdd);
 
-// Variable for user submitted drinks
-let userSubmittedDrink = {          
+    // Create a variable to reference the database
+    let databaseAdd = firebase.database();
 
-    // Property-value pairs
-    userName: "",                   // Name of user
-    nameOfDrink: "",                // Name of beverage
-    ingredients: [],                // Ingredients array
-    instructions: ""                // Instructions for recipe
-};
+    // Variable for user submitted drinks
+    let userSubmittedDrink = {          
 
-// Capture button click for recipe submission
-$("#submit-drink-button").on("click", function(event) {
+        // Property-value pairs
+        userName: "",                   // Name of user
+        nameOfDrink: "",                // Name of beverage
+        ingredients: [],                // Ingredients array
+        instructions: ""                // Instructions for recipe
+    };
 
-    // Don't refresh the page!
-    event.preventDefault();
+    // Capture button click for recipe submission
+    $("#submit-drink-button").on("click", function(event) {
 
-    // Capture inputs locally to push to Firebase database
-    userSubmittedDrink.userName = $("#user-name-input").val().trim();
-    userSubmittedDrink.nameOfDrink = $("#drink-name-input").val().trim();
-    userSubmittedDrink.instructions = $("#ingredient-input-instructions").val().trim();
+        // Don't refresh the page!
+        event.preventDefault();
 
-    // Loop through ingredients inputs
-    for (let i = 1; i <= 5; i++) {
+        // Capture inputs locally to push to Firebase database
+        userSubmittedDrink.userName = $("#user-name-input").val().trim();
+        userSubmittedDrink.nameOfDrink = $("#drink-name-input").val().trim();
+        userSubmittedDrink.instructions = $("#ingredient-input-instructions").val().trim();
 
-        // Local variables for data input gathering
-        let quantityID   = "#ingredient-input-quantity-" + i;
-        let unitsID      = "#ingredient-input-units-" + i;
-        let ingredientID = "#ingredient-input-name-" + i;
+        // Loop through ingredients inputs
+        for (let i = 1; i <= 5; i++) {
 
-        // Get user input values
-        let tempQuantity = $(quantityID).val().trim();
+            // Local variables for data input gathering
+            let quantityID   = "#ingredient-input-quantity-" + i;
+            let unitsID      = "#ingredient-input-units-" + i;
+            let ingredientID = "#ingredient-input-name-" + i;
 
-        if (tempQuantity != "") {
-        // if (typeof tempQuantity == 'undefined') {
-            
-            // build an ingredient array element and push it
-            let tempUnits = $(unitsID).val().trim();
-            let tempIngredientName = $(ingredientID).val().trim();
+            // Get user input values
+            let tempQuantity = $(quantityID).val().trim();
 
-            let ingredientPush = {
-                ingredientQuantity: tempQuantity,      
-                ingredientUnits: tempUnits,     
-                ingredientName: tempIngredientName   
-            };
+            if (tempQuantity != "") {
+            // if (typeof tempQuantity == 'undefined') {
+                
+                // build an ingredient array element and push it
+                let tempUnits = $(unitsID).val().trim();
+                let tempIngredientName = $(ingredientID).val().trim();
 
-            userSubmittedDrink.ingredients.push(ingredientPush);
-            
-        } // End quantity if statement
-    } // End ingredient gathering loop
+                let ingredientPush = {
+                    ingredientQuantity: tempQuantity,      
+                    ingredientUnits: tempUnits,     
+                    ingredientName: tempIngredientName   
+                };
 
-    // testing
-    console.log(userSubmittedDrink);
+                userSubmittedDrink.ingredients.push(ingredientPush);
+                
+            } // End quantity if statement
+        } // End ingredient gathering loop
 
-    // Validate user input
-    // TO BE WRITTEN
-    
+        // testing
+        console.log(userSubmittedDrink);
 
-    // Update Firebase database
-    databaseAdd.ref().push({                   // Using .push from .set for data additions over replacement
+        // Validate user input
+        // TO BE WRITTEN
+        
 
-        userSubmittedDrink: userSubmittedDrink 
-    });
+        // Update Firebase database
+        databaseAdd.ref().push({                   // Using .push from .set for data additions over replacement
 
-    // Reset userSubmittedDrink variable for next set of input values
-    userSubmittedDrink.userName = "";
-    userSubmittedDrink.nameOfDrink = "";
-    userSubmittedDrink.ingredients = [];        // Set ingredients array to contain nothing
-    userSubmittedDrink.ingredients = "";
+            userSubmittedDrink: userSubmittedDrink 
+        });
 
-}); // End Capture button click for recipe submission
+        // Reset userSubmittedDrink variable for next set of input values
+        userSubmittedDrink.userName = "";
+        userSubmittedDrink.nameOfDrink = "";
+        userSubmittedDrink.ingredients = [];        // Set ingredients array to contain nothing
+        userSubmittedDrink.ingredients = "";
 
+    }); // End Capture button click for recipe submission
+
+}) // End document ready
