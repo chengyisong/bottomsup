@@ -40,6 +40,7 @@ $(document).ready(() => {
   });
 });
 
+
 //
 // Cocktail and Ingredient search input texts
 // Validate and construct a search string
@@ -57,7 +58,7 @@ class SearchInput {
     const result = this.validate(this.cocktail);
 
     if (result === false) {
-      window.status = 'Check "cocktail" name';
+      console.log('The "cocktail" name appears invalid');
     }
 
     return result;
@@ -70,7 +71,7 @@ class SearchInput {
     const result = this.validate(this.ingredient);
 
     if (result === false) {
-      window.status ='Check "ingredient" name';
+      console.log('The "ingredient" appears invalid');
     }
 
     return result;
@@ -143,6 +144,66 @@ class SearchInput {
     return searchTerms;
   }
 }
+
+//
+// A class for reading text using Web Speech API
+//
+class ReadText {
+  constructor() {
+    this.synth = window.speechSynthesis;
+    this.voices = [];
+    this.voiceSetting = this.defaultVoice();
+    this.utter = new SpeechSynthesisUtterance();
+  }
+
+  //
+  // Collect all available voices
+  // getVoices() is very flaky returning nothing ... 
+  //
+  collectVoices() {
+    return this.voices = this.synth.getVoices();
+  }
+
+  //
+  // Set default voice, pitch, and rate
+  //
+  defaultVoice() {
+    let voiceConfig = { 'id': 1, 'pitch': 1, 'rate': 1 }
+
+    return voiceConfig;
+  }
+
+  //
+  // Read out the "text"
+  //
+  readOut(text) {
+    this.utter.text = text;
+    this.collectVoices();
+    this.utter.voice = this.voices[this.voiceSetting['id']];
+    this.utter.pitch = this.voiceSetting['pitch'];
+    this.utter.rate = this.voiceSetting['rate'];
+
+    this.synth.speak(this.utter);
+  }
+
+  //
+  // Get title and article of the current item and read out
+  // See fuctnion showArticles(result) of NYTimes and GCSE classes
+  //
+  article(event) {
+    const self = event.data;
+
+    // --> TO-DO: an idea is to avoid redundant text on the web page
+    // const title = $(`${this} h5 a`).text();
+    // const text = $(`${this} p`).text();
+    // self.readOut(text);
+
+    self.readOut($(this).attr('text'));
+  }
+}
+
+// Instanciate ReadText to be used by classes
+const readText = new ReadText(); 
 
 //
 // Abstract class for search using free, public API
@@ -357,14 +418,20 @@ class NYTimes extends APISearch {
   // * clear = IF true, clear the selector contents before populating
   // *         ELSE, append found articles to the target selector
   //
-  searchArticles(searchTerm) {
+  // NOTE: an implementation of fetching more articles is unexpectedly
+  //       complicated in this interface having multiple tabs. Because
+  //       a user could go back and forth on different tabs while
+  //       different search for web and video also populate the same
+  //       target section with search results. So, not implemented...
+  //
+  searchArticles(searchTerm, clear = true) {
     if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
       return;
     }
 
     const isNewSearch = (this.currentTerm === searchTerm) ? false : true;
 
-    if (isNewSearch) {
+    if (clear || isNewSearch) {
       console.log(`New serach word ${searchTerm} (old: ${this.currentTerm})`);
       $('#articlesResult').text("");
       $('#articlesResult').prepend(`<h2>Articles about "${searchTerm}"</h2><br>`);
@@ -393,6 +460,7 @@ class NYTimes extends APISearch {
       const h5 = $('<h5>');
       const h5Link = $('<a>');
       const link = $('<a>');
+      const button = $('<button>');
       const p = $('<p>');
       const br = $('<br>');
 
@@ -408,6 +476,13 @@ class NYTimes extends APISearch {
       link.text(item.web_url);
       p.text(item.snippet);
 
+      // TO-DO: for now to get a quick access to the text
+      button.attr('text', h5Link.text() + '. ' + p.text());
+      button.text('read');
+      button.addClass('btn btn-outline-success btn-sm ml-3 px-1 py-0');
+      button.bind("click", readText, readText.article);
+
+      h5.append(button);
       div.append(h5).append(link).append(p).append(br);
       $('#articlesResult').append(div);
     });
@@ -606,3 +681,4 @@ class YTSL extends APISearch {
     });
   }
 }
+
