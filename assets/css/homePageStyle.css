@@ -63,3 +63,23 @@
             background-color: rgb(187,211,62);
             border-color: rgb(187,211,62) ;
         }
+        .thumbNail {
+            width: 200px;
+            height: 200px;
+        }
+        .cocktailDiv {
+            float: left;
+            padding: 5px;
+            text-align: center;            
+        }
+        * {
+            box-sizing: border-box;
+        }
+        .bigImage {
+            width: 300px;
+            height: 300px;
+        }
+        .cocktailRecipe {
+            text-align: center;
+        }
+        
