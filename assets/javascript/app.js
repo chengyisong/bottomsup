@@ -83,12 +83,8 @@ $( document ).ready(function() {
         userSubmittedDrink.userName = "";
         userSubmittedDrink.nameOfDrink = "";
         userSubmittedDrink.ingredients = [];            // Set ingredients array to contain nothing
-        // userSubmittedDrink.ingredients.splice(0, userSubmittedDrink.ingredients.length);
-        // while (userSubmittedDrink.ingredients.length > 0) {
-        //     userSubmittedDrink.ingredients.pop();
-        // }
         userSubmittedDrink.numberOfIngredients = 0;     // Reset array counter for Firebase ease of use
-        userSubmittedDrink.ingredients = "";
+        userSubmittedDrink.instructions = "";
 
     }); // End Capture button click for recipe submission
 
