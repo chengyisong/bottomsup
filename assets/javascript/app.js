@@ -5,7 +5,7 @@ $( document ).ready(function() {
 
     // Variable for Firebase configuration has been placed in separate firebase.js file
 
-    // Define a database variable additions -- different scope than firebase.js db variable
+    // Define a database variable for additions -- different scope than firebase.js db variable
     let database = firebase.database();
 
     // Variable for user submitted drinks
