@@ -114,6 +114,7 @@ function displayRecipe(drink) {
   var imageUrl = drink.strDrinkThumb;
   var href = $("<a>");
   href.attr("href", "recipePage.html?id="+drink.idDrink);
+  href.attr("target", "_blank");
   var cocktailImage = $("<img class='thumbNail'>");
   cocktailImage.attr("src", imageUrl);
   href.append(cocktailImage)
@@ -576,7 +577,7 @@ class NYTimes extends APISearch {
     let numItems = 0;
 
     if (docs.length === 0) {
-      const h5 = $('<h5>').text('No (additional) matching result found');
+      const h5 = $('<h5>').text('No matching result found');
       $('#articlesResult').append(h5);
       return;
     }
