@@ -4,6 +4,9 @@ $( document ).ready(function() {
 
   // Variable for Firebase configuration has been placed in separate firebase.js file
 
+  // Define a database variable -- different scope than firebase.js db variable
+  let database = firebase.database();
+
   // Define Variable
   let drinkList = [];
 
@@ -36,7 +39,7 @@ $( document ).ready(function() {
       var newBtn = $("<button>");
 
       $(newBtn).addClass("drinkBtn");             // Add class (for the onclick event)
-      $(newBtn).addClass("btn-info");             // Add class (for bootstrap style)
+      $(newBtn).addClass("btn-info m-1");         // Add class (for bootstrap style)
       $(newBtn).attr("data-num", i);              // Add data-num attribute to label each drink button with the index
       $(newBtn).text(buttonName);
 

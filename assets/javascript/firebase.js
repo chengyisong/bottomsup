@@ -13,8 +13,5 @@ $(document).ready(function() {
     };
     firebase.initializeApp(config);
 
-    // Define a database variable for reference
-    let database = firebase.database()
-
 });
     
