@@ -3,18 +3,10 @@
 // Initialize Firebase on chengyison account for additions
 $( document ).ready(function() {
 
-    var configAdd = {
-        apiKey: "AIzaSyCFqAd4UK2fTREHACjWb725Pvp3pKI4PwM",
-        authDomain: "uwbottomsup.firebaseapp.com",
-        databaseURL: "https://uwbottomsup.firebaseio.com",
-        projectId: "uwbottomsup",
-        storageBucket: "uwbottomsup.appspot.com",
-        messagingSenderId: "844557366354"
-    };
-    firebase.initializeApp(configAdd);
+    // Variable for Firebase configuration has been placed in separate firebase.js file
 
-    // Create a variable to reference the database
-    let databaseAdd = firebase.database();
+    // Define a database variable additions -- different scope than firebase.js db variable
+    let database = firebase.database();
 
     // Variable for user submitted drinks
     let userSubmittedDrink = {          
@@ -75,7 +67,7 @@ $( document ).ready(function() {
         // TO BE WRITTEN
 
         // Update Firebase database *********** BUG: ONLY WORKS WITH ONE SUBMIT; THROWS AN ERROR ON SUBSEQUENT SUBMITS WITHOUT PAGE REFRESH
-        databaseAdd.ref().push({                   // Using .push from .set for data additions over replacement
+        database.ref().push({                   // Using .push from .set for data additions over replacement
             userSubmittedDrink: userSubmittedDrink 
         });
 

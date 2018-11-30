@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Click Button with Firebase!</title>
+
+  <!-- -->
+  <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+
+</head>
+
+<body>
+
+  <!-- -->
+  <h1>Ouch! You've clicked me
+    <span id="click-value"></span> times!</h1>
+
+  <!-- -->
+  <button id="click-button">Click Me!!!!</button>
+
+  <!-- -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- ================================================================================== -->
+  <script>
+
+    // Configuration for connecting to the firebase database
+    var config = {
+      apiKey: "AIzaSyAJS4YQWU5DmESeYueG1qH1NGkjv3DncEY",
+      authDomain: "fir-click-counter-7cdb9.firebaseapp.com",
+      databaseURL: "https://fir-click-counter-7cdb9.firebaseio.com",
+      storageBucket: "fir-click-counter-7cdb9.appspot.com"
+    };
+
+    // Connecting to firebase database (which has already been created at firebase.google.com)
+    firebase.initializeApp(config);
+
+    // VARIABLES
+    // --------------------------------------------------------------------------------
+
+    // Create a locale database variable and local click counter
+    var database = firebase.database();
+    var clickCounter = 0;
+
+    // FUNCTIONS + EVENTS
+    // --------------------------------------------------------------------------------
+
+    // Button click event handler
+    $("#click-button").on("click", function() {
+      clickCounter++;                               // Increment local click counter
+      database.ref().set({                          // Firebase clickCount gets local var clickCounter
+        clickCount: clickCounter
+        // clickCount: "Oh yeah";
+      });
+    });
+
+    // MAIN PROCESS + INITIAL CODE
+    // --------------------------------------------------------------------------------
+
+    // Waiting for a new value to appear in firebase and update the web page according to changing values in firebase
+    database.ref().on("value", function(snapshot) {
+      console.log(snapshot.val());                          // Console log to see snapshot
+      $("#click-value").text(snapshot.val().clickCount);    // Update web page
+      clickCounter = snapshot.val().clickCount;             // local clickCounter get's firebase's snapshot clickCount
+    }, function(errorObject) {                              // Error handling
+      console.log("The read failed: " + errorObject.code);
+    });
+
+  </script>
+
+</body>
+
+</html>

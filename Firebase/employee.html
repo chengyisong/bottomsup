@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <!-- Meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+          <!-- Link to the jQuery Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        
+        <!-- <link rel="stylesheet" href="style.css"> -->
+
+        <!-- Firebase database -->
+        <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script> -->
+
+        <title>Employee Data Management</title>
+    </head>
+
+    <body>
+
+        <div class="container">
+
+            <!-- Jumbotron header -->
+            <div class="col-lg-12">
+                <div class="jumbotron jumbotron-fluid">
+                    <div class="container">
+                        <h1 class="display-4 text-center">Employee Data Management</h1>
+                        <p class="lead text-center">A Comprehensive Directory of Employee Billable Hours</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="card card-default">
+                    <div class="card-header">Current Employees</div>
+                    <div class="card-body" id="current-employees">
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-2 font-weight-bold">Employee Name</div>
+                            <div class="col-lg-2 font-weight-bold">Role</div>
+                            <div class="col-lg-2 font-weight-bold">Start Date</div>
+                            <div class="col-lg-2 font-weight-bold">Months Worked</div>
+                            <div class="col-lg-2 font-weight-bold">Monthly Rate ($)</div>
+                            <div class="col-lg-2 font-weight-bold">Total Billed ($)</div>
+                        </div>
+                        <hr>
+
+                        <!-- Prototype JS to build data population -->
+                        <div class="employee-content"></div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
+            <br><br>
+
+            <!-- Add Employee Form -->
+            <div class="col-lg-12">
+                <div class="card card-default">
+                    <div class="card-header">Add Employee</div>
+                        <div class="section">
+                            <form class="form">
+                                <!-- <div class="header">
+                                <h2 class="form-title"><i class="fab fa-searchengin"></i>Add Employee</h2>
+                                </div> -->
+                                <div class="body">
+                                <div class="form-group">
+                                    <label for="search-term">Employee Name</label>
+                                    <input type="text" class="form-control" id="employee-name-input" placeholder="John Doe"> 
+                                    <!-- aria-describedby="emailHelp" -->
+                                </div>
+                                <div class="form-group">
+                                    <label for="search-limit">Role</label>
+                                    <input type="text" class="form-control" id="employee-role-input" placeholder="CEO">
+                                </div>
+                                <div class="form-group">
+                                    <label for="search-start">Start Date</label>
+                                    <input type="text" class="form-control" id="employee-start-date-input" placeholder="MM/DD/YYYY">
+                                    <!-- <small class="form-text text-muted">Use yyyymmddd format.</small> -->
+                                </div>
+                                <div class="form-group">
+                                    <label for="search-end">Monthly Rate</label>
+                                    <input type="number" class="form-control" id="employee-monthly-rate-input" placeholder="2000">
+                                    <!-- <small class="form-text text-muted">2000</small> -->
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-search" id="employee-submit-button"><i class="fas fa-search"></i>Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div> <!-- End Bootstrap container -->
+
+        <!-- Link to app.js -->
+        <!-- <script type="text/javascript" src="app.js"></script> -->
+        <script type="text/javascript">
+
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyDGaaV7yYlRrKtPPXdfcEdQoAh6XcY7WsI",
+            authDomain: "wilder-edms.firebaseapp.com",
+            databaseURL: "https://wilder-edms.firebaseio.com",
+            projectId: "wilder-edms",
+            storageBucket: "wilder-edms.appspot.com",
+            messagingSenderId: "115737018904"
+        };
+        firebase.initializeApp(config);
+
+            // Create a variable to reference the database
+            var database = firebase.database();
+
+            // Initial Values
+            var name = "";
+            var role = "";
+            var startDate = "7/4/18";
+            var monthlyRate = "";
+            
+            // Capture Button Click
+            $("#employee-submit-button").on("click", function(event) {
+
+                // Don't refresh the page!
+                event.preventDefault();
+
+                // Capture inputs locally Firebase database
+                name = $("#employee-name-input").val().trim();
+                role = $("#employee-role-input").val().trim();
+                // startDate = $("#employee-start-date-input").val().trim();                // Fill in later with a library feature
+                monthlyRate= $("#employee-monthly-rate-input").val().trim();
+
+                // Testing
+                console.log(name);
+                console.log(role);
+                console.log(startDate);
+                console.log(monthlyRate);
+
+                // Update Firebase database
+                database.ref().push({                   // Changed from .set
+                    name: name,
+                    role: role,
+                    startDate: startDate,
+                    monthlyRate: monthlyRate
+                });
+            });
+
+    // Firebase watcher + initial loader HINT: This code behaves similarly to .on("value")
+    database.ref().on("child_added", function(childSnapshot) {
+
+        // Log everything that's coming out of snapshot
+        console.log(childSnapshot.val().name);
+        console.log(childSnapshot.val().role);
+        console.log(childSnapshot.val().startDate);
+        console.log(childSnapshot.val().monthlyRate);
+
+        // full list of items to the display
+        // addEmployeeRow(childSnapshot.val().name, childSnapshot.val().role, childSnapshot.val().startDate, childSnapshot.val().monthlyRate);
+
+        $(".employee-content").append("<div class='row'> " +
+                '<div class="col-lg-2" id="emp-name">' + childSnapshot.val().name + "</div>" +
+                '<div class="col-lg-2" id="emp-role">' + childSnapshot.val().role + "</div>" +
+                '<div class="col-lg-2" id="start-date">' + childSnapshot.val().startDate + "</div>" +
+                '<div class="col-lg-2" id="months-worked">' + "" + "</div>" +
+                '<div class="col-lg-2" id="monthly-rate">'  + "" + "</div>" +
+                '<div class="col-lg-2" id="total-billed">' + childSnapshot.val().monthlyRate + "</div>" + 
+            + "</div>" );
+
+        // $("#full-member-list").append("<div class='well'><span class='member-name'> " +
+        //     childSnapshot.val().name +
+        //     " </span><span class='member-email'> " + childSnapshot.val().email +
+        //     " </span><span class='member-age'> " + childSnapshot.val().age +
+        //     " </span><span class='member-comment'> " + childSnapshot.val().comment +
+        //     " </span></div>");
+
+                        // <div class="row">
+                        // <div class="col-lg-2" id="emp-name">Test</div>
+                        // <div class="col-lg-2" id="emp-role">Test</div>
+                        // <div class="col-lg-2" id="start-date">Test</div>
+                        // <div class="col-lg-2" id="months-worked">Test</div>
+                        // <div class="col-lg-2" id="monthly-rate">Test</div>
+                        // <div class="col-lg-2" id="total-billed">Test</div>
+                        // </div>
+
+
+        // Handle the errors
+        }, function(errorObject) {
+        console.log("Errors handled: " + errorObject.code);
+    });
+
+
+    function addEmployeeRow (empName, empRole, empDate, empRate) {
+
+        // Add row to employee-content
+        let newRow = $("<div>").addClass("row");
+
+        // console.log("addEmployeeRow function called");
+        
+        let newDiv = $("<div>").addClass("col-lg-2");
+        newDiv.text = empName;
+        // newRow.append(newDiv);
+        newRow.text = newRow.text + newDiv;
+
+        // let newDiv2 = $("<div>").addClass("col-lg-2");
+        // newDiv2.text = empRole;
+        // // newRow.append(newDiv2);
+        // newRow.html = newRow.text + newDiv2;
+
+        // let newDiv3 = $("<div>").addClass("col-lg-2");
+        // newDiv3.text = empDate;
+        // // newRow.append(newDiv3);
+        // newRow.html = newRow.text + newDiv3;
+
+        // let newDiv4 = $("<div>").addClass("col-lg-2");
+        // newDiv4.text = "";                                // Fill in Months Worked later
+        // // newRow.append(newDiv4);
+        // newRow.html = newRow.text + newDiv4;
+
+        // let newDiv5 = $("<div>").addClass("col-lg-2");
+        // newDiv5.text = empRate;
+        // // newRow.append(newDiv5);
+        // newRow.html = newRow.text + newDiv5;
+
+        // let newDiv6 = $("<div>").addClass("col-lg-2");
+        // newDiv6.text = "";                               // Fill in Total Billed later
+        // // newRow.append(newDiv6);
+        // newRow.html = newRow.text + newDiv6;
+
+        // $(".employee-content").append(newRow);
+
+                        // <div class="row">
+                        // <div class="col-lg-2" id="emp-name">Test</div>
+                        // <div class="col-lg-2" id="emp-role">Test</div>
+                        // <div class="col-lg-2" id="start-date">Test</div>
+                        // <div class="col-lg-2" id="months-worked">Test</div>
+                        // <div class="col-lg-2" id="monthly-rate">Test</div>
+                        // <div class="col-lg-2" id="total-billed">Test</div>
+                        // </div>
+
+    } // End add employee row function
+
+
+
+
+
+        
+        
+        
+        </script>
+    </body>
+</html>

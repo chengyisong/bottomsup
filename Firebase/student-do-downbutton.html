@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+    <!-- Activity – 11 countdownbutton – wk7/day2
+    Last edited 3 days ago
+    Instructions:
+    · Using either logic.js (unsolved) (easier) or logicOption2.js (harder), create the click down activity using a Firebase database to store the click data on the backend.
+    · Your application should be able to run on multiple browser windows simultaneously and register click events on each screen correctly. -->
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>CountDown Button with Firebase!</title>
+
+  <!-- Firebase Reference -->
+  <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+
+</head>
+
+<body>
+
+  <h1>Only
+    <span id="click-value"></span> clicks to go!!</h1>
+
+  <button id="click-button">Click Me!!!!</button>
+  <button id="restart-button">Restart</button>
+
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- Script -->
+  <script src="logic.js"></script>
+
+</body>
+
+</html>
