@@ -19,7 +19,9 @@ $(document).ready(() => {
   // Submit button click event
   $('#submit-button').click(event => {
     event.preventDefault();
-    article.searchArticles(new SearchInput().getSearchTerms());
+    const searchInput = new SearchInput();
+    searchRecipes(searchInput.cocktail.toLowerCase(), searchInput.ingredient.toLowerCase());
+    article.searchArticles(searchInput.getSearchTerms());
   });
 
   // "Article" tab button click event
@@ -41,6 +43,95 @@ $(document).ready(() => {
   });
 });
 
+function hasIngredient(drink, ingredient) {
+  for (var i = 1; i < 16; i++) {
+    var key = "strIngredient" + i;
+    var value = drink[key];
+
+    if ((value != null) && (value.trim().toLowerCase() === ingredient) ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function filterByIngredient(drinks, ingredient, callback) {
+  for (var i = 0; i < drinks.length; i++) {
+    var drink = drinks[i];
+
+    if ( (ingredient === "") || (hasIngredient(drink, ingredient)) ) {
+      callback(drink);
+    }
+  }
+}
+
+function searchByCocktailName(cocktailName, ingredient, callback) {
+  var queryURL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
+
+  $.ajax({
+    url: queryURL,
+    method: "GET"
+    }).then(function(response){
+      var drinks = response.drinks;
+      filterByIngredient(drinks, ingredient, callback);
+    });
+}
+
+function getDrinkById(drinkId, callback) {
+  var queryURL = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + drinkId;
+
+  $.ajax({
+    url: queryURL,
+    method: "GET"
+    }).then(function(response){
+      drink = response.drinks[0];
+      callback(drink);
+    });
+}
+
+function searchByIngredient(ingredient, callback) {
+  var queryURL = "https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=" + ingredient;
+
+  $.ajax({
+    url: queryURL,
+    method: "GET"
+    }).then(function(response){
+      var drinks = response.drinks;
+
+      for (var i = 0; i < drinks.length; i++) {
+        getDrinkById(drinks[i].idDrink, callback);
+      }
+    });
+}
+
+function displayRecipe(drink) {
+  console.log("drink: ", drink.strDrink);
+  console.log("image url: ", drink.strDrinkThumb);
+
+  var cocktailDiv = $("<div class='cocktailDiv'>");
+  var p = $("<p>").text(drink.strDrink);
+  var imageUrl = drink.strDrinkThumb;
+  var href = $("<a>");
+  href.attr("href", "recipePage.html?id="+drink.idDrink);
+  var cocktailImage = $("<img class='thumbNail'>");
+  cocktailImage.attr("src", imageUrl);
+  href.append(cocktailImage)
+  cocktailDiv.append(p);
+  cocktailDiv.append(href);
+
+  $("#searchResults").append(cocktailDiv);
+}
+
+function searchRecipes(cocktailName, ingredient) {
+  console.log("cocktail name: " + cocktailName);
+
+  if (cocktailName !== "") {
+    searchByCocktailName(cocktailName, ingredient, displayRecipe);
+  } else if (ingredient !== "") {
+    searchByIngredient(ingredient, displayRecipe);
+  }
+}
 
 //
 // Cocktail and Ingredient search input texts
