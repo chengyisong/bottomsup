@@ -42,7 +42,6 @@ $( document ).ready(function() {
             let tempQuantity = $(quantityID).val().trim();
 
             if (tempQuantity != "") {
-            // if (typeof tempQuantity == 'undefined') {
                 
                 // build an ingredient array element and push it
                 let tempUnits = $(unitsID).val().trim();
@@ -60,16 +59,22 @@ $( document ).ready(function() {
             } // End quantity if statement
         } // End ingredient gathering loop
 
-        // testing
-        console.log(userSubmittedDrink);
-
         // Validate user input
-        // TO BE WRITTEN
+        if (validateInput()) {  // User's input was good
 
-        // Update Firebase database *********** BUG: ONLY WORKS WITH ONE SUBMIT; THROWS AN ERROR ON SUBSEQUENT SUBMITS WITHOUT PAGE REFRESH
-        database.ref().push({                   // Using .push from .set for data additions over replacement
-            userSubmittedDrink: userSubmittedDrink 
-        });
+            // Update Firebase database
+            database.ref().push({                   // Using .push from .set for data additions over replacement
+                userSubmittedDrink: userSubmittedDrink 
+            });
+
+            // Let user know of successful input
+            $("#submissionSuccessModal").modal("show");
+
+        } else {  // User's input was bad
+
+            // Let user know more information is needed in order to proceed
+            $("#submissionNonsuccessModal").modal("show");
+        }
 
         // Reset userSubmittedDrink variable for next set of input values
         userSubmittedDrink.userName = "";
@@ -79,5 +84,24 @@ $( document ).ready(function() {
         userSubmittedDrink.instructions = "";
 
     }); // End Capture button click for recipe submission
+
+    // Validate user input function
+    function validateInput() {
+
+        if (userSubmittedDrink.userName != "" &&
+            userSubmittedDrink.nameOfDrink != "" &&
+            userSubmittedDrink.numberOfIngredients != 0 &&
+            userSubmittedDrink.instructions != "" ) {
+
+            // All fields have been populated, proceed
+            return true;
+
+        } else {
+
+            // All fields have not been populated, do not proceed
+            return false;
+        }
+
+    } // End validate user input function
 
 }) // End document ready

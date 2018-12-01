@@ -1,4 +1,4 @@
-// Bottoms Up -- Carrie Song -- userRecipe2.js -- 11/29/18, updated by Wilder Molyneux
+// Bottoms Up -- Carrie Song -- userRecipes.js -- 11/29/18; updated by Wilder Molyneux 
 
 $( document ).ready(function() {
 
@@ -13,14 +13,7 @@ $( document ).ready(function() {
   // Get all data from Firebase
   database.ref().on("child_added", function(snapshot) {
 
-    // Testing    
-    console.log("child_added!!!");
-    console.log(snapshot.toJSON());
-
     let key = snapshot.key;
-
-    // Testing
-    console.log("key is " + key);
 
     // Push all drinks (as objects) into the drinkList array
     drinkList.push(snapshot.toJSON());
@@ -39,14 +32,11 @@ $( document ).ready(function() {
       var newBtn = $("<button>");
 
       $(newBtn).addClass("drinkBtn");             // Add class (for the onclick event)
-      $(newBtn).addClass("btn-info m-1");         // Add class (for bootstrap style)
+      $(newBtn).addClass("btn-info m-1 p-2");         // Add class (for bootstrap style)
       $(newBtn).attr("data-num", i);              // Add data-num attribute to label each drink button with the index
       $(newBtn).text(buttonName);
 
       $("#btnArea").append(newBtn);               // Append to web page
-      
-      // Testing
-      console.log(buttonName);
 
     } // End for loop
   }, 1000); // End setTimeout function
@@ -75,9 +65,6 @@ $( document ).ready(function() {
       let ingDisplay= $("<li>");
 
       $(ingDisplay).text(drinkList[drinkIndex].userSubmittedDrink.ingredients[i].ingredientQuantity + " " + drinkList[drinkIndex].userSubmittedDrink.ingredients[i].ingredientUnits + " of " + drinkList[drinkIndex].userSubmittedDrink.ingredients[i].ingredientName);
-
-      // Testing
-      console.log("Ingredient Name: " + drinkList[drinkIndex].userSubmittedDrink.ingredients[i].ingredientName);
 
       $("#userIng").append(ingDisplay);
 
