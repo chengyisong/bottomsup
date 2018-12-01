@@ -6,6 +6,7 @@
   -------------------------------------------------------------------------
 */
 
+
 //
 // Prepare button click event listners
 //
@@ -113,6 +114,7 @@ function displayRecipe(drink) {
   var imageUrl = drink.strDrinkThumb;
   var href = $("<a>");
   href.attr("href", "recipePage.html?id="+drink.idDrink);
+  href.attr("target", "_blank");
   var cocktailImage = $("<img class='thumbNail'>");
   cocktailImage.attr("src", imageUrl);
   href.append(cocktailImage)
@@ -149,7 +151,10 @@ class SearchInput {
     const result = this.validate(this.cocktail);
 
     if (result === false) {
-      console.log('The "cocktail" name appears invalid');
+      const errMsg = 'The "cocktail" name appears invalid';
+      console.log(errMsg);
+      // Pop-up isn't working for unknown reason...
+      document.getElementById("cocktail-name-input").setCustomValidity(errMsg);
     }
 
     return result;
@@ -243,7 +248,7 @@ class ReadText {
   constructor() {
     this.synth = window.speechSynthesis;
     this.voices = [];
-    this.voiceSetting = this.defaultVoice();
+    this.voiceSetting = null;
     this.utter = new SpeechSynthesisUtterance();
   }
 
@@ -257,11 +262,38 @@ class ReadText {
 
   //
   // Set default voice, pitch, and rate
+  // lang: "en-US"
   //
   defaultVoice() {
-    let voiceConfig = { 'id': 1, 'pitch': 1, 'rate': 1 }
+    this.voiceSetting = { 'id': 1, 'pitch': 1, 'rate': 1, 'volume': 1 };
+    let ndx = -1;
 
-    return voiceConfig;
+    if (this.voices.length === 0) {
+      this.collectVoices();
+    }
+    console.log(`# ofvoices: ${this.voices.length}`);
+
+    // seaerch for the 1st available US English voice
+    for (let i = 0; i < this.voices.length; i++) {
+      if (/en-US/.test(this.voices[i]['lang'])) {
+        ndx = i;
+        break;
+      }
+    }
+
+    if (ndx > -1) {
+      this.voiceSetting['id'] = ndx;
+      console.log(`ndx: ${ndx}, ${this.voices[ndx]['name']}`);
+    } else {
+      this.voiceSetting['id'] = 0;
+      console.log(`en-US Not found ndx: ${ndx}, ${this.voices[ndx]['name']}`);
+    }
+    // for debugging, iOS(iphone)
+    // got ndx: 14, Aaron, so appears to be set but still no voice...
+    // well, as it turned out, it workds now.. this API just seems super flaky
+    // alert(`ndx: ${ndx}, ${this.voices[ndx]['name']}`);
+
+    return this.voiceSetting;
   }
 
   //
@@ -269,10 +301,15 @@ class ReadText {
   //
   readOut(text) {
     this.utter.text = text;
-    this.collectVoices();
+    this.defaultVoice();
     this.utter.voice = this.voices[this.voiceSetting['id']];
+    // this.collectVoices();
+    // this.utter.voice = this.voices[1];
+    // this.utter.pitch = 1; // this.voiceSetting['pitch'];
+    // this.utter.rate = 1; // this.voiceSetting['rate'];
     this.utter.pitch = this.voiceSetting['pitch'];
     this.utter.rate = this.voiceSetting['rate'];
+    this.utter.volume = this.voiceSetting['volume'];
 
     this.synth.speak(this.utter);
   }
@@ -516,7 +553,7 @@ class NYTimes extends APISearch {
   //       target section with search results. So, not implemented...
   //
   searchArticles(searchTerm, clear = true) {
-    if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
+    if (!searchTerm || /^(\W|_)*$/.test(searchTerm) || searchTerm.length === 0) {
       return;
     }
 
@@ -540,7 +577,7 @@ class NYTimes extends APISearch {
     let numItems = 0;
 
     if (docs.length === 0) {
-      const h5 = $('<h5>').text('No (additional) matching result found');
+      const h5 = $('<h5>').text('No matching result found');
       $('#articlesResult').append(h5);
       return;
     }
@@ -622,7 +659,7 @@ class GCSE extends APISearch {
   // Search articles (Google search)
   //
   searchArticles(searchTerm, clear = true) {
-    if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
+    if (!searchTerm || /^(\W|_)*$/.test(searchTerm) || searchTerm.length === 0) {
       return;
     }
     if (clear) {
@@ -732,7 +769,7 @@ class YTSL extends APISearch {
   searchArticles(searchTerm, clear = true) {
     let boostedTerm = searchTerm;  // for getting a better query result
 
-    if (searchTerm.length === 0 || /^[\W_]*$/.test(searchTerm)) {
+    if (!searchTerm || /^(\W|_)*$/.test(searchTerm) || searchTerm.length === 0) {
       return;
     }
 
